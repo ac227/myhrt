@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="app_title">我的 HRT 记录</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1 data-i18n="app_title">我的 HRT 记录</h1>
+    <div class="topbar-actions">
+      <span id="signed-in-as" class="role-pill"></span>
+      <button id="btn-export" class="btn" data-i18n="export">导出 JSON</button>
+      <button id="btn-import" class="btn" data-i18n="import" hidden>导入 JSON</button>
+      <input id="import-file" type="file" accept=".json,application/json" hidden>
+      <select id="lang-switch" title="Language">
+        <option value="zh">中文</option>
+        <option value="en">English</option>
+      </select>
+      <button id="btn-logout" class="btn btn-ghost" data-i18n="logout">退出登录</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="chart-card" id="chart-card">
+      <div class="chart-head">
+        <div>
+          <h2 data-i18n="chart_title">估算浓度</h2>
+          <p class="chart-now" id="chart-now">—</p>
+        </div>
+        <div class="chart-controls">
+          <div class="tabs" id="series-tabs" role="tablist">
+            <button type="button" class="tab active" data-series="e2">E2</button>
+            <button type="button" class="tab" data-series="t">T</button>
+            <button type="button" class="tab" data-series="cpa">CPA</button>
+          </div>
+          <div class="tabs" id="range-tabs" role="tablist">
+            <button type="button" class="tab" data-range="14" data-i18n="range_14">14 天</button>
+            <button type="button" class="tab active" data-range="30" data-i18n="range_30">30 天</button>
+            <button type="button" class="tab" data-range="90" data-i18n="range_90">90 天</button>
+          </div>
+          <label class="weight">
+            <span data-i18n="field_weight">体重</span>
+            <input id="weight" type="text" inputmode="decimal" value="60">
+            <span>kg</span>
+          </label>
+        </div>
+      </div>
+      <div class="chart-stage" id="chart-stage">
+        <svg id="chart" viewBox="0 0 800 280" role="img"></svg>
+        <div id="chart-tip" class="chart-tip" hidden></div>
+        <p id="chart-empty" class="chart-empty" hidden></p>
+      </div>
+      <p class="chart-note" data-i18n="chart_note">曲线是药代模型的估算，会和抽血结果差很多，不能代替化验或医嘱。</p>
+    </section>
+
+    <div class="toolbar">
+      <div class="tabs" role="tablist">
+        <button type="button" id="tab-dose" class="tab active" data-i18n="tab_doses">用药</button>
+        <button type="button" id="tab-lab" class="tab" data-i18n="tab_labs">检查</button>
+      </div>
+      <button id="btn-add" class="btn btn-primary" data-i18n="new_dose" hidden>记录用药</button>
+      <div class="filter">
+        <input type="date" id="filter-from" aria-label="from">
+        <span class="muted">–</span>
+        <input type="date" id="filter-to" aria-label="to">
+        <button id="btn-filter" class="btn btn-ghost" data-i18n="apply_filter">筛选</button>
+        <button id="btn-clear-filter" class="btn btn-ghost" data-i18n="clear_filter">清除</button>
+      </div>
+    </div>
+
+    <div id="records" class="records log-wrap"></div>
+    <div id="empty" class="empty" data-i18n="no_records" hidden>暂无记录</div>
+  </main>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="modal-title" data-i18n="new_record">新增记录</h2>
+        <button id="btn-close" class="btn-icon" aria-label="Close">×</button>
+      </div>
+      <form id="record-form" class="form">
+        <div class="form-grid">
+          <label class="field">
+            <span class="label" data-i18n="field_time">时间</span><span class="req">*</span>
+            <input type="datetime-local" id="f-time" required>
+          </label>
+          <label class="field" data-for="dose">
+            <span class="label" data-i18n="field_route">给药方式</span><span class="req">*</span>
+            <select id="f-route"></select>
+          </label>
+          <label class="field" data-for="dose">
+            <span class="label" data-i18n="field_ester">药物</span><span class="req">*</span>
+            <select id="f-ester"></select>
+          </label>
+          <label class="field" data-for="dose">
+            <span class="label" data-i18n="field_dose_mg">剂量 (mg)</span><span class="req">*</span>
+            <input type="text" id="f-dose" inputmode="decimal" required>
+          </label>
+          <label class="field extra" id="extra-concentration" hidden>
+            <span class="label" data-i18n="field_conc_mgml">浓度 (mg/mL)</span>
+            <input type="text" id="f-concentration" inputmode="decimal">
+          </label>
+          <label class="field extra" id="extra-area" hidden>
+            <span class="label" data-i18n="field_area">涂抹面积 (cm²)</span>
+            <input type="text" id="f-area" inputmode="decimal">
+          </label>
+          <label class="field extra" id="extra-site" hidden>
+            <span class="label" data-i18n="field_gel_site">涂抹部位</span>
+            <select id="f-site">
+              <option value="0" data-i18n="site_arm">手臂</option>
+              <option value="1" data-i18n="site_thigh">大腿</option>
+              <option value="2" data-i18n="site_scrotal">阴囊</option>
+            </select>
+          </label>
+          <label class="field extra" id="extra-hold" hidden>
+            <span class="label" data-i18n="field_hold">含服时间 (分钟)</span>
+            <input type="text" id="f-hold" inputmode="decimal">
+          </label>
+          <label class="field extra" id="extra-rate" hidden>
+            <span class="label" data-i18n="field_patch_rate">释放速率 (µg/天)</span>
+            <input type="text" id="f-rate" inputmode="decimal">
+          </label>
+          <label class="field extra" id="extra-wear" hidden>
+            <span class="label" data-i18n="field_patch_wear">佩戴时长 (小时)</span>
+            <input type="text" id="f-wear" inputmode="decimal">
+          </label>
+          <label class="field" data-for="lab" hidden>
+            <span class="label" data-i18n="field_lab_value">结果</span><span class="req">*</span>
+            <input type="text" id="f-conc" inputmode="decimal">
+          </label>
+          <label class="field" data-for="lab" hidden>
+            <span class="label" data-i18n="field_lab_unit">单位</span>
+            <select id="f-unit">
+              <option value="pg/ml">E2 · pg/mL</option>
+              <option value="pmol/l">E2 · pmol/L</option>
+              <option value="ng/dl">T · ng/dL</option>
+              <option value="nmol/l">T · nmol/L</option>
+            </select>
+          </label>
+          <label class="field" data-for="lab" hidden>
+            <span class="label" data-i18n="field_assay">检测方法</span>
+            <select id="f-assay">
+              <option value="" data-i18n="assay_unknown">不确定</option>
+              <option value="immuno">Immunoassay</option>
+              <option value="lcms">LC-MS/MS</option>
+            </select>
+          </label>
+        </div>
+        <label class="field">
+          <span class="label" data-i18n="field_notes">备注</span>
+          <textarea id="f-notes" rows="3"></textarea>
+        </label>
+        <div class="form-actions">
+          <button type="button" id="btn-cancel" class="btn" data-i18n="cancel">取消</button>
+          <button type="submit" class="btn btn-primary" data-i18n="save">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="i18n.js"></script>
+  <script src="pk.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

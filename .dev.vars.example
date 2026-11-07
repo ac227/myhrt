@@ -1,0 +1,9 @@
+# 复制本文件为 .dev.vars，并填入真实值（用于本地开发）。
+# 生成方式见 README.md 的“部署步骤”一节。
+#
+# 密码哈希：node scripts/hash-password.mjs '你的密码'
+# COOKIE_SECRET：node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+ADMIN_PASSWORD_HASH=pbkdf2_sha256$100000$<salt>$<hash>
+GUEST_PASSWORD_HASH=pbkdf2_sha256$100000$<salt>$<hash>
+COOKIE_SECRET=<64位十六进制随机串>

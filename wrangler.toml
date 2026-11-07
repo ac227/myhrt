@@ -1,0 +1,8 @@
+name = "myhrt"
+compatibility_date = "2025-04-22"
+pages_build_output_dir = "./public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "myhrt-db"
+database_id = "e280b5e8-40f4-4d07-89b0-f8711d2c5db3"

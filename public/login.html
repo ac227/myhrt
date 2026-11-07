@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="app_title">我的 HRT 记录</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <h1 data-i18n="app_title">我的 HRT 记录</h1>
+    <p class="muted" data-i18n="login_subtitle">请选择身份并输入密码</p>
+    <form id="login-form">
+      <div class="field">
+        <span class="label" data-i18n="role_label">身份</span>
+        <div class="role-switch" id="login-role-switch" data-value="admin" role="radiogroup" aria-label="身份">
+          <span class="role-switch-thumb" aria-hidden="true"></span>
+          <button type="button" class="role-switch-btn active" data-role="admin" role="radio" aria-checked="true">
+            <span data-i18n="role_admin">管理员</span>
+          </button>
+          <button type="button" class="role-switch-btn" data-role="guest" role="radio" aria-checked="false">
+            <span data-i18n="role_guest">访客</span>
+          </button>
+        </div>
+        <input type="hidden" id="login-role" name="role" value="admin">
+      </div>
+      <label class="field">
+        <span class="label" data-i18n="password_label">密码</span>
+        <input type="password" id="login-password" required autocomplete="current-password">
+      </label>
+      <button type="submit" class="btn btn-primary btn-block" data-i18n="sign_in">登录</button>
+    </form>
+    <div id="login-error" class="error" hidden></div>
+    <div class="login-footer">
+      <select id="lang-switch" title="Language">
+        <option value="zh">中文</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </div>
+  <script src="i18n.js"></script>
+  <script src="login.js"></script>
+</body>
+</html>

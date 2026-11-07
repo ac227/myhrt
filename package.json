@@ -1,0 +1,14 @@
+{
+  "name": "myhrt",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev public",
+    "deploy": "wrangler pages deploy public --project-name myhrt --branch main",
+    "hash": "node scripts/hash-password.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}
